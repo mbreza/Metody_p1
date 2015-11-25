@@ -1,244 +1,174 @@
 package main;
 
-
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
 
 public class Main {
  
-public static void main(String[] args){	
-
-double[] x = {1, 3};
-
+public static void main(String[] args) throws FileNotFoundException{	
+double[] przedzial = {1, 7};	
+//Podanie wartości x-ów	
+double[] x = {2, 3, 5, 6};
 int count = 0;
-
+//Sprawdzanie wielkości macierzy
 int dlugosc = x.length;
-
 double[] y = new double[dlugosc];
-
 double[][] matrix = new double[dlugosc][dlugosc];
-
-
-
-for(int i = 0 ; i < dlugosc ; i++){
-
-	y[i]=Math.cos(x[i]);
-	System.out.print(y[i]+",   ");
-}
-
-System.out.println();
-System.out.println("");
-
-for(int i = 0 ; i < dlugosc ; i++){
-	matrix[i][0]=1;
-}
-
-for(int i = 0 ; i < dlugosc ; i++){
-	for(int j = 1 ; j < dlugosc ; j++){
-		matrix[i][j]=Math.pow(x[count],j);
-		
-	}
-	count++;
-
-}
-
-double det = determinant(matrix);
-
-
-if(det==0){
-	System.out.println("Wyznacznik 0.");
-}else{
-	
-
-
-
-
-
-for(int i = 0 ; i < dlugosc ; i++){
-	for(int j = 0 ; j < dlugosc ; j++){
-
-		System.out.print(matrix[i][j]+", ");
-		
-	}
-
-	System.out.println(" ");
-}
-
-double matrixrevers[][] = invert(matrix);
-
-System.out.println(" ");
-System.out.println(" ");
-System.out.println(" ");
-
-for(int i = 0 ; i < dlugosc ; i++){
-	for(int j = 0 ; j < dlugosc ; j++){
-
-	System.out.print(matrixrevers[i][j]+", ");
-		
-	}
-
-	System.out.println(" ");
-}
-
-System.out.println(" ");
-System.out.println(" ");
-System.out.println(" ");
-
 double outcome[] = new double[dlugosc];
-
 double tmp = 0;
 double variable = 0;
+String tmp1;
+String funkcja2="";
+
+	//Podanie wartości funkcji f(x)
+	String funkcja1 = "x+x^2";
 
 
+	//Obliczanie y poprzez funkcje f(x)
+	for(int i = 0 ; i < dlugosc ; i++){
+		y[i]=Math.cos(x[i]);
+	}
 
-for(int i = 0 ; i < dlugosc ; i++){
-	for(int j = 0 ; j < dlugosc ; j++){
+	
+	//Tworzenie macierzy
+	for(int i = 0 ; i < dlugosc ; i++){
+		matrix[i][0]=1;
+	}
+	for(int i = 0 ; i < dlugosc ; i++){
+		for(int j = 1 ; j < dlugosc ; j++){
+		matrix[i][j]=Math.pow(x[count],j);
+		
+		}
+		count++;
+	}
 
+	//Odwrocenie macierzy
+	double matrixrevers[][] = invertMatrix(matrix);	
+	
+	//Mnożenie macierzy
+	for(int i = 0 ; i < dlugosc ; i++){
+		for(int j = 0 ; j < dlugosc ; j++){
 			tmp = matrixrevers[i][j]*y[j];
 			variable = variable + tmp;
 		}
 	outcome[i] = variable;
-	System.out.print("variable="+i+":"+variable);
-	variable = 0;
+	variable = 0;		
+	}
+
+	//Utworzenie wielomianu interpolujacego
+	for(int j = 0 ; j < dlugosc ; j++){	
 	
-	System.out.println(" ");
-}
+		if(j==(dlugosc-1)){
+			tmp1 = "x^"+j+"*"+outcome[j];
+			funkcja2+=tmp1;
+		}else{
+			tmp1 = "x^"+j+"*"+outcome[j]+"+";
+			funkcja2+=tmp1;	
+		}
+	
+	}
 
-System.out.println("///////////////////////");
-for(int j = 0 ; j < dlugosc ; j++){
-
-System.out.print(outcome[j]+", ");
-
-}
-
-}
-
-
-}
-
-public static double determinant(double[][] matrix){ 
-    int sum=0; 
-    int s;
-    if(matrix.length==1){  
-      return(matrix[0][0]);
-    }
-    for(int i=0;i<matrix.length;i++){ 
-      double[][]smaller= new double[matrix.length-1][matrix.length-1]; 
-      for(int a=1;a<matrix.length;a++){
-        for(int b=0;b<matrix.length;b++){
-          if(b<i){
-            smaller[a-1][b]=matrix[a][b];
-          }
-          else if(b>i){
-            smaller[a-1][b-1]=matrix[a][b];
-          }
-        }
-      }
-      if(i%2==0){ 
-        s=1;
-      }
-      else{
-        s=-1;
-      }
-      sum+=s*matrix[0][i]*(determinant(smaller));
-    }
-    return(sum);
-  }
+	//Wypisanie wilomianu interpolujacego	
+	System.out.println(funkcja2);
 
 
-public static double[][] invert(double a[][]) 
-{
-    int n = a.length;
-    double x[][] = new double[n][n];
-    double b[][] = new double[n][n];
-    int index[] = new int[n];
-    for (int i=0; i<n; ++i) 
-        b[i][i] = 1;
-
-
-    gaussian(a, index);
-
-    for (int i=0; i<n-1; ++i)
-        for (int j=i+1; j<n; ++j)
-            for (int k=0; k<n; ++k)
-                b[index[j]][k]
-                	    -= a[index[j]][i]*b[index[i]][k];
-
-
-    for (int i=0; i<n; ++i) 
-    {
-        x[n-1][i] = b[index[n-1]][i]/a[index[n-1]][n-1];
-        for (int j=n-2; j>=0; --j) 
-        {
-            x[j][i] = b[index[j]][i];
-            for (int k=j+1; k<n; ++k) 
-            {
-                x[j][i] -= a[index[j]][k]*x[k][i];
-            }
-            x[j][i] /= a[index[j]][j];
-        }
-    }
-    return x;
+	//Stworzenie skryptu R
+	PrintWriter zapis = new PrintWriter("plik.R");
+	zapis.println("fun1<-function(x) "+ funkcja1);
+	zapis.println("fun2<-function(x) "+ funkcja2);
+	zapis.println("x<-seq("+przedzial[0]+", "+przedzial[1]+", by = 0.0001)");
+	zapis.println("matplot(x,cbind(fun1(x),fun2(x)), ylim=c(-20, 20), type=\"l\") ; abline(h=0)");
+	zapis.close();
 }
 
 
 
-public static void gaussian(double a[][], int index[]) 
-{
-    int n = index.length;
-    double c[] = new double[n];
+public static double [][] invertMatrix(double a[][]) {
+	int i,j,k,m; 
+	double temp; 
+	int numRows = a.length; 
+	int numCols = a[0].length; 
+	int index[][] = new int[numRows][2];  
+
+	partialPivot(a, new double[numRows], index); 
+	
+	//Dzielenie obecnego wersu przez a[i][i]
+	for(i=0; i<numRows; ++i) {
+		
+		temp = a[i][i]; 
+		for(j=0; j<numCols; ++j) {
+			a[i][j] /= temp; 
+			} 
+		a[i][i] = 1.0/temp;
+		//Redukcja pozostalych wersow poprzez odejmowanie pomnozonej wartosci obecnej lini
+		for(k=0; k<numRows; ++k) {
+			
+			if (k != i) { 
+				temp = a[k][i];
+				for(j=0; j<numCols; ++j) {				
+					a[k][j] -= temp*a[i][j]; 
+					} 
+				a[k][i] = -temp*a[i][i];
+				} 
+			} 
+		}
+	//Odwracanie kolumn w macierzy na podstawie wartosci index
+	for(j=numCols-1; j>=0; --j) { 
+		k = index[j][0]; 
+		m = index[j][1]; 
+		if (k != m) { 
+			for(i=0; i<numRows; ++i) { 
+				temp = a[i][m];
+				a[i][m] = a[i][k];
+				a[i][k] = temp;
+				} 
+			} 
+		}
+		  
+	return a; 
+	}
 
 
-    for (int i=0; i<n; ++i) 
-        index[i] = i;
 
-
-    for (int i=0; i<n; ++i) 
-    {
-        double c1 = 0;
-        for (int j=0; j<n; ++j) 
-        {
-            double c0 = Math.abs(a[i][j]);
-            if (c0 > c1) c1 = c0;
-        }
-        c[i] = c1;
-    }
-
-
-    int k = 0;
-    for (int j=0; j<n-1; ++j) 
-    {
-        double pi1 = 0;
-        for (int i=j; i<n; ++i) 
-        {
-            double pi0 = Math.abs(a[index[i]][j]);
-            pi0 /= c[index[i]];
-            if (pi0 > pi1) 
-            {
-                pi1 = pi0;
-                k = i;
-            }
-        }
-
-
-        int itmp = index[j];
-        index[j] = index[k];
-        index[k] = itmp;
-        for (int i=j+1; i<n; ++i) 	
-        {
-            double pj = a[index[i]][j]/a[index[j]][j];
-
-
-            a[index[i]][j] = pj;
-
-            for (int l=j+1; l<n; ++l)
-                a[index[i]][l] -= pj*a[index[j]][l];
-        }
-    }
-}
+private static void partialPivot( double a[][], double b[], int index[][]) {
+	double temp;
+	double tempRow[];
+	int i,j,m;
+	int numRows = a.length; 
+	int numCols = a[0].length; 
+	double scale[] = new double[numRows];  
+	//Znalezienie najwiekszego elementu w wierszu
+	//Inicjac index[][] zapamietującego układ macierzy
+	for(i=0; i<numRows; ++i) { 
+		index[i][0] = i;
+		index[i][1] = i; 
+		for(j=0; j<numCols; ++j) { 
+			scale[i] = Math.max(scale[i],Math.abs(a[i][j])); 
+			} 
+		}
+	//Znajdowanie elementu osiowego dla kazdej kolumny
+	//Zamian wierszy w macierzy 
+	for(j=0; j<numCols-1; ++j) {
+		m=j; 
+		for(i=j+1; i<numRows; ++i) {
+			if ( Math.abs(a[i][j])/scale[i] > Math.abs(a[m][j])/scale[m] ){
+				m=i; 
+				} 
+			} if ( m != j ) {
+				index[j][0] = j;
+				index[j][1] = m; 
+				tempRow = a[j];
+				a[j] = a[m]; 
+				a[m] = tempRow;  
+				temp = b[j]; 
+				b[j] = b[m]; 
+				b[m] = temp;  
+				temp = scale[j]; 
+				scale[j] = scale[m]; 
+				scale[m] = temp; 
+				}
+			} 
+	return; 
+	}
 
 } 
- 
-
-
-
-
- 
